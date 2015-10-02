@@ -33,3 +33,10 @@ build/
 
 # unless supporting rvm < 1.11.0 or doing something fancy, ignore this:
 .rvmrc
+.idea/runConfigurations
+.idea/inspectionProfiles
+.idea/github-badges.iml
+.idea/codeStyleSettings.xml
+.idea/workspace.xml
+
+.idea/*
