@@ -1,5 +1,9 @@
 # GitHub Basic Badges
 
+[![GitHub Release](https://github-basic-badges.herokuapp.com/release/kennedyoliveira/github-basic-badges.svg)]()
+[![GitHub Download Count](https://github-basic-badges.herokuapp.com/downloads/kennedyoliveira/github-basic-badges/total.svg)]()
+[![GitHub Issues Open](https://github-basic-badges.herokuapp.com/issues/kennedyoliveira/github-basic-badges.svg)]() |
+
 Basic badges for using with GitHub, and a service that you can deploy and create your own service to serve the GitHub badges.
 
 ## Motivation
@@ -19,6 +23,19 @@ All the URL Patterns showed in the table bellow must be used as `<app-url>\<url-
 | `release/<user>/<repo>.svg` | Latest release tag name. | [![GitHub Release](https://github-basic-badges.herokuapp.com/release/kennedyoliveira/github-basic-badges.svg)]() |
 | `issues/<user>/<repo>.svg` | Total issues open. | [![GitHub Issues Open](https://github-basic-badges.herokuapp.com/issues/kennedyoliveira/github-basic-badges.svg)]() |
 | `commits/<user>/<repo>.svg` | Total commits. | [![GitHub Commits](https://github-basic-badges.herokuapp.com/commits/kennedyoliveira/github-basic-badges.svg)]() |
+
+### Custom colors and text
+
+You can customize the colors and the text of the badges, just use `color` and `text` parameters in the url, like customizing the last release example, check below:
+
+[![GitHub Release Ex 1](https://github-basic-badges.herokuapp.com/release/kennedyoliveira/github-basic-badges.svg?color=blue&text=last--release)]()
+[![GitHub Release Ex 2](https://github-basic-badges.herokuapp.com/release/kennedyoliveira/github-basic-badges.svg?color=orange)]()
+[![GitHub Release Ex 3](https://github-basic-badges.herokuapp.com/release/kennedyoliveira/github-basic-badges.svg?text=final--release)]()
+[![GitHub Release Ex 4](https://github-basic-badges.herokuapp.com/release/kennedyoliveira/github-basic-badges.svg?color=green)]()
+[![GitHub Release Ex 5](https://github-basic-badges.herokuapp.com/release/kennedyoliveira/github-basic-badges.svg?color=yellow)]()
+[![GitHub Release Ex 6](https://github-basic-badges.herokuapp.com/release/kennedyoliveira/github-basic-badges.svg?9900ff)]()
+
+For colors you can use any hex colors you want, and some basic already defined, check the file [badge.rb](https://github.com/kennedyoliveira/github-basic-badges/blob/master/badges/badge.rb) for some basic colors.
 
 ### Deploying on Heroku
 
