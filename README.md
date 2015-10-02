@@ -2,7 +2,7 @@
 
 [![GitHub Release](https://github-basic-badges.herokuapp.com/release/kennedyoliveira/github-basic-badges.svg)]()
 [![GitHub Download Count](https://github-basic-badges.herokuapp.com/downloads/kennedyoliveira/github-basic-badges/total.svg)]()
-[![GitHub Issues Open](https://github-basic-badges.herokuapp.com/issues/kennedyoliveira/github-basic-badges.svg)]() |
+[![GitHub Issues Open](https://github-basic-badges.herokuapp.com/issues/kennedyoliveira/github-basic-badges.svg)]()
 
 Basic badges for using with GitHub, and a service that you can deploy and create your own service to serve the GitHub badges.
 
