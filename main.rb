@@ -1,39 +1,5 @@
+require './badges.rb'
 require 'sinatra'
-require 'net/http'
-require 'json'
-
-def send_request(uri, params=nil)
-  uri = URI.parse(uri)
-
-  # Extra params for custom badges
-  uri.query = URI.encode_www_form(params) unless params.nil? or params.empty?
-
-  http = Net::HTTP.new(uri.host, uri.port)
-  http.use_ssl = true
-  http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-
-  request = Net::HTTP::Get.new(uri.request_uri)
-
-  http.request(request)
-end
-
-#
-# Generate the Badge in SVG format.
-#
-# @param [String] text Text to be displayed in the left said of a badge
-# @param [String] status Value to be displayed in the right side of a badge
-# @param [String] color Color that can be one of the following ... // TODO Document this crap
-# @param [Hash] params Extra params for customizing the badge // TODO Document this crap too
-# @return [String] SVG for the badge
-def build_badge(text, status, color, params=nil)
-  uri = "https://img.shields.io/badge/#{URI.encode(text.to_s)}-#{URI.encode(status.to_s)}-#{color}.svg"
-
-  resp = send_request(uri, params)
-
-  raise 'Error generating the badge' unless resp.code == '200'
-
-  resp.body
-end
 
 # GitHub API URL
 GITHUB_API = 'https://api.github.com/repos'
@@ -42,123 +8,105 @@ GITHUB_API = 'https://api.github.com/repos'
 # Generate badges with download count
 # Can be by tag, for the latest, summing all assets download or by a specified file name
 #
-get '/downloads/:user/:repo/:tag/:asset.svg' do
-  text = params['text'] ||= 'downloads'
-  color = params['color'] ||= 'brightgreen'
+get '/downloads/:user/:repo/?:tag?/:asset.svg' do
+  tag = params['tag'] ||= 'latest'
 
   git_uri = "#{GITHUB_API}/#{params['user']}/#{params['repo']}/releases/"
 
-  if params['tag'] == 'latest'
-    git_uri += "#{params['tag']}"
+  if tag == 'latest'
+    git_uri += "#{tag}"
   else
-    git_uri += "tags/#{params['tag']}"
+    git_uri += "tags/#{tag}"
   end
 
-  git_resp = send_request(git_uri)
+  custom_params = { 'text' => 'downloads', 'color' => Badges::BASIC_COLORS[:bgreen] }
 
-  if git_resp.code != '200'
-    status = 'vendor error'
-    text = 'vendor'
-    color = 'lightgray'
-  else
-    resp_json = JSON.parse(git_resp.body)
-
+  badge_request(git_uri, custom_params) do |resp|
+    # If is the total, i sum the total downloads for each asset
     if params['asset'] == 'total'
-      status = resp_json['assets'].inject(0) { |total, asset| total + asset['download_count'] }
+      resp['assets'].inject(0) { |total, asset| total + asset['download_count'] }
     else
-      asset = resp_json['assets'].find { |asset| asset['name'] == params['asset'] }
+      # Else, i try to find the asset with the name especified
+      asset = resp['assets'].find { |asset| asset['name'] == params['asset'] }
 
-      if asset.nil?
-        text = 'vendor'
-        status = 'asset not found'
-        color = 'red'
-      else
-        status = asset['download_count']
-      end
+      # If i doesn't find, i return an error
+      return nil if asset.nil?
+
+      asset['download_count']
     end
   end
-
-  badge = build_badge(text, status, color)
-  response.header['Content-Type'] = 'image/svg+xml;charset=utf-8'
-  response.header['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-  response.body = badge
 end
 
 #
 # Get the last release tag name
 #
 get '/release/:user/:repo.svg' do
-  text = params['text'] ||= 'release'
-  color = params['color'] ||= 'brightgreen'
-
   git_uri = "#{GITHUB_API}/#{params['user']}/#{params['repo']}/releases/latest"
 
-  resp = send_request(git_uri)
+  custom_params = { 'text' => 'release', 'color' => Badges::BASIC_COLORS[:lgreen] }
 
-  if resp.code != '200'
-    text = 'vendor'
-    status = 'vendor error'
-    color = 'lightgray'
-  else
-    status = JSON.parse(resp.body)['tag_name']
-  end
-
-  badge = build_badge(text, status, color)
-  response.header['Content-Type'] = 'image/svg+xml;charset=utf-8'
-  response.header['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-  response.body = badge
+  badge_request(git_uri, custom_params) { |resp| resp['tag_name'] }
 end
 
 #
 # Get the issues open
 #
 get '/issues/:user/:repo.svg' do
-  text = params['text'] ||= 'open--issues'
-  color = params['color'] ||= 'red'
+  custom_params = { 'text' => 'open--issues', 'color' => 'red' }
 
   git_uri = "#{GITHUB_API}/#{params['user']}/#{params['repo']}"
 
-  resp = send_request(git_uri)
-
-  if resp.code != '200'
-    text = 'vendor'
-    status = 'vendor error'
-    color = 'lightgray'
-  else
-    status = JSON.parse(resp.body)['open_issues_count']
-  end
-
-  badge = build_badge(text, status, color)
-  response.header['Content-Type'] = 'image/svg+xml;charset=utf-8'
-  response.header['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-  response.body = badge
+  badge_request(git_uri, custom_params) { |resp| resp['open_issues_count'] }
 end
 
 #
 # Get the total commits
 #
 get '/commits/:user/:repo.svg' do
-  # https://api.github.com/repos/kennedyoliveira/alfred-rates/stats/commit_activity
-  text = params['text'] ||= 'commits'
-  color = params['color'] ||= 'blue'
-
   git_uri = "#{GITHUB_API}/#{params['user']}/#{params['repo']}/contributors"
 
-  resp = send_request(git_uri)
+  custom_parameters = { 'text' => 'commits', 'color' => 'blue' }
 
-  if resp.code != '200'
-    text = 'vendor'
-    status = 'vendor error'
-    color = 'lightgray'
-  else
-    contributors = JSON.parse(resp.body)
-    total_commits = contributors.inject(0) {|sum, contributor| sum + contributor['contributions']}
+  badge_request(git_uri, custom_parameters) { |resp| resp.inject(0) { |sum, contrib| sum + contrib['contributions'] } }
+end
 
-    status = total_commits
-  end
+#
+# Utility method that encapsulate the badge request logic
+#
+# Receives a url that will try to get, if got it succefully the body will be parsed as JSON and send to the block.
+# Will merge the custom parameters for badge creating too.
+#
+# @param [String] url URL to be called before the block, and the response will be passed to the block if succefully
+# @param [String] custom_params Custom parameters to be merged with parameters request, priorizing the parameters request, this parameters is default one for the badge request
+# @param block A block that will receive the Response as json and a Hash with parameters merged, and must return a Badges::Badge instance or a single value that will be used to create a Badge
+def badge_request(url, custom_params = nil, &block)
+  raise 'Must pass a block for this method!' unless block_given?
 
-  badge = build_badge(text, status, color)
+  custom_params ||= {}
+
+  # @type [Hash]
+  new_params = custom_params.merge(params)
+
+  resp = Badges::HttpUtils.get(url)
+
+  # If failed to get GitHub valid api response, returns a vendor error badge
+  return Badges.build_vendor_error_badge if resp.code != '200'
+
+  # Call a block passing the response as a Json, and the new params for creating the Badge
+  resp_badge = block.call(JSON.parse(resp.body), new_params)
+
+  # If the blocks yields nil, then return Vendor Error
+  return Badges::build_vendor_error_badge if resp_badge.nil?
+
+  # Return the response
   response.header['Content-Type'] = 'image/svg+xml;charset=utf-8'
   response.header['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-  response.body = badge
+
+  # If the return was a badge, returns this Badge
+  return resp_badge if resp_badge.instance_of? Badges::Badge
+
+  # If not a badge, create a new one
+  Badges::Badge.new(new_params['text'],
+                    resp_badge,
+                    new_params.fetch('color', Badges::BASIC_COLORS[:bgreen]))
 end
