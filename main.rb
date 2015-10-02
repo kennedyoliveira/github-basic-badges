@@ -1,4 +1,6 @@
-require 'bundler/setup'
+require 'bundler'
+Bundler.setup
+
 require './badges/badges'
 require 'sinatra'
 
@@ -25,15 +27,18 @@ get '/downloads/:user/:repo/?:tag?/:asset.svg' do
   badge_request(git_uri, custom_params) do |resp|
     # If is the total, i sum the total downloads for each asset
     if params['asset'] == 'total'
-      resp['assets'].inject(0) { |total, asset| total + asset['download_count'] }
+      downloads = resp['assets'].inject(0) { |total, asset| total + asset['download_count'] }
+
+      next "#{downloads} #{tag}" unless tag == 'latest'
+      downloads
     else
       # Else, i try to find the asset with the name especified
       asset = resp['assets'].find { |asset| asset['name'] == params['asset'] }
 
       # If i doesn't find, i return an error
-      return nil if asset.nil?
+      next nil if asset.nil?
 
-      asset['download_count']
+      "#{asset['download_count']}_#{asset['name']}"
     end
   end
 end
