@@ -49,7 +49,7 @@ end
 get '/release/:user/:repo.svg' do
   git_uri = "#{GITHUB_API}/#{params['user']}/#{params['repo']}/releases/latest"
 
-  custom_params = { 'text' => 'release', 'color' => Badges::BASIC_COLORS[:lgreen] }
+  custom_params = { 'text' => 'release', 'color' => Badges::BASIC_COLORS[:bgreen] }
 
   badge_request(git_uri, custom_params) { |resp| resp['tag_name'] }
 end
@@ -102,7 +102,7 @@ def badge_request(url, custom_params = nil, &block)
   resp_badge = block.call(JSON.parse(resp.body), new_params)
 
   # If the blocks yields nil, then return Vendor Error
-  return Badges::build_vendor_error_badge if resp_badge.nil?
+  return Badges.build_vendor_error_badge if resp_badge.nil?
 
   # Return the response
   response.header['Content-Type'] = 'image/svg+xml;charset=utf-8'

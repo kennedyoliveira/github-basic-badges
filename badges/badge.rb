@@ -39,7 +39,7 @@ module Badges
     end
   end
 
-  def build_vendor_error_badge
+  def self.build_vendor_error_badge
     Badge.new('vendor', 'error', BASIC_COLORS[:lightgray])
   end
 end
