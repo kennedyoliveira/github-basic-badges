@@ -42,7 +42,7 @@ GITHUB_API = 'https://api.github.com/repos'
 # Generate badges with download count
 # Can be by tag, for the latest, summing all assets download or by a specified file name
 #
-get '/downloadcount/:user/:repo/:tag/:asset.svg' do
+get '/downloads/:user/:repo/:tag/:asset.svg' do
   text = params['text'] ||= 'downloads'
   color = params['color'] ||= 'brightgreen'
 
