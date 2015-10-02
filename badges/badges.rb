@@ -1,8 +1,8 @@
 require 'net/http'
 require 'json'
-require './badge.rb'
-require './http_utils.rb'
-require './badge_utils.rb'
+require './badges/badge'
+require './badges/http_utils'
+require './badges/badge_utils'
 
 module Badges
 

@@ -1,4 +1,5 @@
-require './badges.rb'
+require 'bundler/setup'
+require './badges/badges'
 require 'sinatra'
 
 # GitHub API URL
