@@ -23,6 +23,8 @@ All the URL Patterns showed in the table bellow must be used as `<app-url>\<url-
 | `release/<user>/<repo>.svg` | Latest release tag name. | [![GitHub Release](https://github-basic-badges.herokuapp.com/release/kennedyoliveira/github-basic-badges.svg)]() |
 | `issues/<user>/<repo>.svg` | Total issues open. | [![GitHub Issues Open](https://github-basic-badges.herokuapp.com/issues/kennedyoliveira/github-basic-badges.svg)]() |
 | `commits/<user>/<repo>.svg` | Total commits. | [![GitHub Commits](https://github-basic-badges.herokuapp.com/commits/kennedyoliveira/github-basic-badges.svg)]() |
+| `license/<user>/<repo>.svg` | Project LICENSE. | [![GitHub License](https://github-basic-badges.herokuapp.com/license/kennedyoliveira/github-basic-badges.svg)]() |
+| `pulls/<user>/<repo>.svg` | Project open pull requests. | [![GitHub Pull Requests](https://github-basic-badges.herokuapp.com/pulls/kennedyoliveira/github-basic-badges.svg)]() |
 
 ### Custom colors and text
 

@@ -77,6 +77,51 @@ get '/commits/:user/:repo.svg' do
 end
 
 #
+# Get the license
+#
+get '/license/:user/:repo.svg' do
+  git_uri = "#{GITHUB_API}/#{params['user']}/#{params['repo']}/license"
+
+  custom_parameters = { 'text' => 'license', 'color' => Badges::BASIC_COLORS[:blue] }
+
+  badge_request(git_uri, custom_parameters) { |resp| resp['license']['name'] }
+end
+
+#
+# Get the pull requests
+#
+get '/pulls/:user/:repo.svg' do
+  git_uri = "#{GITHUB_API}/#{params['user']}/#{params['repo']}/pulls"
+
+  custom_parameters = { 'text' => 'pull--requests', 'color' => Badges::BASIC_COLORS[:red] }
+
+  badge_request(git_uri, custom_parameters) { |resp| resp.size }
+end
+
+ERROR_PAGE_HTML = <<END
+<html>
+  <body>
+    <h1>GitHub Basic Badges</h1>
+    <h4>You are using it wrong! :(</h4>
+    <p>
+    Please, go to <a href=" https : // github.com/kennedyoliveira/github-basic-badges ">GitHub Repository</a> to see how it works!
+    </p>
+    <p>
+    Don't worry, it's not that hard ;)
+    </p>
+  <body>
+</html>
+END
+
+not_found do
+  ERROR_PAGE_HTML
+end
+
+error do
+  ERROR_PAGE_HTML
+end
+
+#
 # Utility method that encapsulate the badge request logic
 #
 # Receives a url that will try to get, if got it succefully the body will be parsed as JSON and send to the block.
