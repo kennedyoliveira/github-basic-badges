@@ -104,7 +104,7 @@ ERROR_PAGE_HTML = <<END
     <h1>GitHub Basic Badges</h1>
     <h4>You are using it wrong! :(</h4>
     <p>
-    Please, go to <a href=" https : // github.com/kennedyoliveira/github-basic-badges ">GitHub Repository</a> to see how it works!
+    Please, go to <a href="https://github.com/kennedyoliveira/github-basic-badges ">GitHub Repository</a> to see how it works!
     </p>
     <p>
     Don't worry, it's not that hard ;)
